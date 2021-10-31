@@ -9,7 +9,7 @@ namespace ClaimsApplication.Services
     public interface IClaimsService
     {
         IEnumerable<Claims> GetAllClaims();
-        string AddClaim(Claims claimToAdd);
-        string DeleteClaim(string claimId);
+        int AddClaim(Claims claimToAdd);
+        int DeleteClaim(string claimId);
     }
 }

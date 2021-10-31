@@ -7,8 +7,8 @@ namespace ClaimsApplication.Models
 {
     public class Audit
     {
-        public string ClaimId { get; set; }
-        public DateTime Timestamp { get; set; }
+        public int ClaimId { get; set; }
+        public string Timestamp { get; set; }
         public string Operation { get; set; }
     }
 }

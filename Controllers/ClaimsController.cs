@@ -21,9 +21,9 @@ namespace ClaimsApplication.Controllers
         public ClaimsController(IClaimsService claimsService)
         {
             _claimsService = claimsService;
-            var connectionString = "Endpoint=sb://getatest.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=54sVS1+162kQF5rkJnO2ofdHPui334eLdFN10MHL988=";
+            var connectionString = "Endpoint=sb://auditqueue.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=ahSn52duR61E/CN2/NoJKMpj6Vu6/UKLtTTf8NXD7uE=";
             _client = new ServiceBusClient(connectionString);
-            _clientSender = _client.CreateSender(QUEUE_NAME);
+            _clientSender = _client.CreateSender("auditqueue");
         }
 
         [HttpGet("getClaimTypes")]
@@ -69,7 +69,7 @@ namespace ClaimsApplication.Controllers
                 {
                     ClaimId = ClaimAddedResponse,
                     Operation = "New Claim Added",
-                    Timestamp = DateTime.Now
+                    Timestamp = DateTime.Now.ToString()
                 };
                 SendMessage(messageToSend);
                 return Ok(ClaimAddedResponse);
@@ -79,7 +79,7 @@ namespace ClaimsApplication.Controllers
         [HttpDelete("deleteClaim/{claimId}")]
         public ActionResult DeleteClaim(string claimId)
         {
-            var ClaimDeletedResponse = "";
+            var ClaimDeletedResponse = 0;
             var ClaimsList = _claimsService.GetAllClaims();
             var IsClaimPresent = ClaimsList.FirstOrDefault(x => x.Id == claimId);
             if (IsClaimPresent != null)
@@ -87,15 +87,15 @@ namespace ClaimsApplication.Controllers
                 ClaimDeletedResponse = _claimsService.DeleteClaim(claimId);
                 var messageToSend = new Audit()
                 {
-                    ClaimId = claimId,
+                    ClaimId = int.Parse(claimId),
                     Operation = "Claim Deleted",
-                    Timestamp = DateTime.Now
+                    Timestamp = DateTime.Now.ToString()
                 };
                 SendMessage(messageToSend);
             }
             else
             {
-                ClaimDeletedResponse = "Claim Id not found";
+                return Ok("Claim Id not found");
             }
             return Ok(ClaimDeletedResponse);
         }

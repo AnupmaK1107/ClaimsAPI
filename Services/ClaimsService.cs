@@ -17,7 +17,7 @@ namespace ClaimsApplication.Services
             string databaseName,
             string containerName)
         {
-            this._container = dbClient.GetContainer(databaseName, containerName);
+            _container = dbClient.GetContainer(databaseName, containerName);
         }
 
         //public ClaimsService(IClaimsRepository claimsrepository)
@@ -39,7 +39,7 @@ namespace ClaimsApplication.Services
             return claimsList;
         }
 
-        public string AddClaim(Claims claimToAdd)
+        public int AddClaim(Claims claimToAdd)
         {
             //int ClaimId = _claimsrepository.AddClaim(claimToAdd);
             //if (ClaimId != 0)
@@ -47,18 +47,20 @@ namespace ClaimsApplication.Services
             //    return ClaimId;
             //}
             //return 0;
-            Guid randomVal = new Guid();
-            claimToAdd.Id = randomVal.ToString();
+            var claimIdList = GetAllClaims().Select(x => x.Id).ToList();
+            var finalClaimIdList = claimIdList.Select(int.Parse).ToList();
+            int claimId = (claimIdList.Count != 0) ? (finalClaimIdList.Max()+1) : 1;
+            claimToAdd.Id = claimId.ToString();
             _container.CreateItemAsync(claimToAdd, new PartitionKey(claimToAdd.Id));
-            return claimToAdd.Id;
+            return (int.Parse(claimToAdd.Id));
         }
 
-        public string DeleteClaim(string claimId)
+        public int DeleteClaim(string claimId)
         {
             //_claimsrepository.DeleteClaim(claimId);
             //return "Claim Deleted Successfully";
             _container.DeleteItemAsync<Claims>(claimId, new PartitionKey(claimId));
-            return claimId;
+            return int.Parse(claimId);
         }
     }
 }
