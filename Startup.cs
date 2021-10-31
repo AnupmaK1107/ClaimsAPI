@@ -30,8 +30,7 @@ namespace ClaimsApplication
             services.AddCors();
             services.AddControllers();
             services.AddSingleton<IClaimsService>(InitializeCosmosClientInstanceAsync(Configuration.GetSection("CosmosDb")).GetAwaiter().GetResult());
-            //services.AddScoped<IClaimsService,ClaimsService>();
-            //services.AddScoped<IClaimsRepository, ClaimsRepository>();
+            services.AddSwaggerGen();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -45,6 +44,8 @@ namespace ClaimsApplication
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseSwagger();
 
             app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:4200").AllowCredentials());
 
