@@ -27,10 +27,21 @@ namespace ClaimsApplication
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCors();
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll",
+                    p => p.AllowAnyOrigin().
+                        AllowAnyHeader().
+                        AllowAnyMethod().
+                        AllowCredentials()
+                        );
+            });
             services.AddControllers();
             services.AddSingleton<IClaimsService>(InitializeCosmosClientInstanceAsync(Configuration.GetSection("CosmosDb")).GetAwaiter().GetResult());
-            services.AddSwaggerGen();
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc(name: "v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Claims API", Version = "v1" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -47,7 +58,13 @@ namespace ClaimsApplication
 
             app.UseSwagger();
 
-            app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:4200").AllowCredentials());
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint(url:"/swagger/v1/swagger.json", name: "Claims API V1");
+            });
+
+            //app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:4200").AllowCredentials());
+            app.UseCors("AllowAll");
 
             app.UseAuthorization();
 
