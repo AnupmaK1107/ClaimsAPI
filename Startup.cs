@@ -1,4 +1,3 @@
-using ClaimsApplication.Repositories;
 using ClaimsApplication.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -32,8 +31,7 @@ namespace ClaimsApplication
                 options.AddPolicy("AllowAll",
                     p => p.AllowAnyOrigin().
                         AllowAnyHeader().
-                        AllowAnyMethod().
-                        AllowCredentials()
+                        AllowAnyMethod()
                         );
             });
             services.AddControllers();
@@ -44,7 +42,6 @@ namespace ClaimsApplication
             });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -63,7 +60,6 @@ namespace ClaimsApplication
                 c.SwaggerEndpoint(url:"/swagger/v1/swagger.json", name: "Claims API V1");
             });
 
-            //app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:4200").AllowCredentials());
             app.UseCors("AllowAll");
 
             app.UseAuthorization();
